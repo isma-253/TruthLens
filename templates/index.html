@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="TruthLens is an AI-powered image authenticity detector for identifying real versus AI-generated images."
+    />
+    <title>TruthLens | AI Image Authenticity Detection</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="site-header">
+        <nav class="navbar container" aria-label="Main navigation">
+          <a href="#top" class="brand" aria-label="TruthLens home">
+            <img src="{{ url_for('static', filename='assets/logo.svg') }}" alt="TruthLens logo" class="brand-logo" />
+            <span>TruthLens</span>
+          </a>
+
+          <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+
+          <div class="nav-links">
+            <a href="#top">Home</a>
+            <a href="#about">About</a>
+            <a href="https://github.com" target="_blank" rel="noreferrer">GitHub</a>
+            <span class="nav-badge">AI Detection</span>
+          </div>
+        </nav>
+      </header>
+
+      <main id="top">
+        <section class="hero">
+          <div class="container hero-inner">
+            <div class="hero-copy">
+              <div class="pill">Powered by EfficientNet-B0</div>
+              <h1>AI-Powered Image<br />Authenticity Detection</h1>
+              <p>
+                Analyze an image and discover whether it is REAL or AI-generated.
+              </p>
+              <div class="hero-actions">
+                <a href="#analysis" class="primary-btn">Analyze Image</a>
+                <a href="#about" class="secondary-btn">Learn More</a>
+              </div>
+            </div>
+
+            <div class="hero-visual" aria-hidden="true">
+              <div class="orb orb-one"></div>
+              <div class="orb orb-two"></div>
+              <div class="scan-grid"></div>
+              <div class="visual-card">
+                <div class="visual-header">
+                  <span class="dot red"></span>
+                  <span class="dot amber"></span>
+                  <span class="dot green"></span>
+                </div>
+                <div class="visual-body">
+                  <div class="mini-panel">
+                    <span class="mini-label">Image Signal</span>
+                    <strong>94.8%</strong>
+                  </div>
+                  <div class="mini-panel alt">
+                    <span class="mini-label">Status</span>
+                    <strong class="success-text">Real</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="analysis" class="analysis-section container">
+          <div class="section-heading">
+            <span class="eyebrow">Image Analysis</span>
+            <h2>Inspect image authenticity</h2>
+          </div>
+
+          <div class="analysis-card">
+            <div class="upload-panel">
+              <input
+                id="imageInput"
+                type="file"
+                accept=".jpg,.jpeg,image/jpeg"
+                hidden
+              />
+
+              <div class="upload-area" id="uploadArea" tabindex="0" role="button" aria-label="Upload image file">
+                <div class="upload-content" id="uploadContent">
+                  <div class="upload-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 16V4m0 0 4 4m-4-4-4 4M4 16.5V18a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                  <h3>Upload an image</h3>
+                  <p>Drag &amp; drop your image here</p>
+                  <span class="browse-link">or browse files</span>
+                  <small>JPG / JPEG supported</small>
+                </div>
+
+                <div class="preview-wrapper hidden" id="previewWrapper">
+                  <img id="imagePreview" alt="Selected preview" />
+                  <div class="preview-overlay">
+                    <span id="fileName">image.jpg</span>
+                    <div class="meta-row">
+                      <span id="imageDimensions">0 × 0</span>
+                      <span id="fileSize">0 KB</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="file-actions hidden" id="fileActions">
+                <button type="button" class="secondary-btn small" id="changeImageBtn">Change Image</button>
+                <button type="button" class="ghost-btn small" id="removeImageBtn">Remove</button>
+              </div>
+
+              <div class="error-message" id="errorMessage" aria-live="polite"></div>
+            </div>
+
+            <div class="action-panel">
+              <button id="analyzeBtn" class="analyze-btn" type="button" disabled>
+                <span class="btn-text">Analyze Image</span>
+                <span class="spinner hidden" aria-hidden="true"></span>
+              </button>
+              <div id="loadingMessage" class="loading-message hidden" aria-live="polite">
+                <span class="loading-pulse" aria-hidden="true"></span>
+                <span>Analyzing image...</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="result-section container hidden" id="resultSection" aria-live="polite">
+          <div class="section-heading">
+            <span class="eyebrow">Result</span>
+            <h2>Authenticity assessment</h2>
+          </div>
+
+          <div class="result-card">
+            <div class="result-image-box">
+              <img id="resultImage" src="" alt="Uploaded image for analysis" />
+            </div>
+
+            <div class="result-details">
+              <div class="result-header-row">
+                <span class="result-label">Prediction</span>
+                <span id="predictionBadge" class="prediction-badge prediction-real">REAL</span>
+              </div>
+
+              <div class="confidence-box">
+                <div class="confidence-row">
+                  <span>Model Confidence</span>
+                  <strong id="confidenceValue">0%</strong>
+                </div>
+                <div class="progress-track" aria-label="Prediction confidence">
+                  <span id="confidenceBar"></span>
+                </div>
+              </div>
+
+              <div class="result-meta">
+                <div>
+                  <span class="meta-label">Prediction label</span>
+                  <strong id="predictionText">REAL</strong>
+                </div>
+                <div>
+                  <span class="meta-label">Model Confidence</span>
+                  <strong id="confidenceText">0%</strong>
+                </div>
+              </div>
+
+              <p id="resultExplanation" class="result-explanation">
+                Model Confidence: 0%
+              </p>
+              <p id="confidenceDisclaimer" class="result-note">
+                Model Confidence is the model's confidence in its prediction and does not represent guaranteed accuracy.
+              </p>
+            </div>
+          </div>
+
+          <div class="result-actions">
+            <button id="tryAnotherBtn" class="secondary-btn" type="button">Try Another Image</button>
+          </div>
+        </section>
+
+        <section id="about" class="info-section">
+          <div class="container narrow">
+            <div class="section-heading align-center">
+              <span class="eyebrow">About</span>
+              <h2>Built for image authenticity analysis</h2>
+            </div>
+
+            <p class="about-copy">
+              TruthLens is an AI-based image authenticity detection project designed to analyze images and estimate whether they are real or artificially generated.
+            </p>
+          </div>
+        </section>
+
+        <section class="steps-section container">
+          <div class="section-heading align-center">
+            <span class="eyebrow">How it works</span>
+            <h2>Simple, transparent analysis</h2>
+          </div>
+
+          <div class="steps-grid">
+            <article class="step-card">
+              <div class="step-number">01</div>
+              <div class="step-icon">⤴</div>
+              <h3>Upload</h3>
+              <p>Upload an image.</p>
+            </article>
+
+            <article class="step-card">
+              <div class="step-number">02</div>
+              <div class="step-icon">✦</div>
+              <h3>AI Analysis</h3>
+              <p>The EfficientNet-B0 model analyzes the image.</p>
+            </article>
+
+            <article class="step-card">
+              <div class="step-number">03</div>
+              <div class="step-icon">✓</div>
+              <h3>Result</h3>
+              <p>TruthLens returns REAL or FAKE with a confidence score.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="tech-section">
+          <div class="container">
+            <div class="section-heading align-center">
+              <span class="eyebrow">Technology</span>
+              <h2>Powered by modern AI tooling</h2>
+            </div>
+
+            <div class="tech-grid">
+              <div class="tech-card">Python</div>
+              <div class="tech-card">PyTorch</div>
+              <div class="tech-card">EfficientNet-B0</div>
+              <div class="tech-card">Computer Vision</div>
+              <div class="tech-card">HTML5</div>
+              <div class="tech-card">CSS3</div>
+              <div class="tech-card">JavaScript</div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <div class="container footer-inner">
+          <div>
+            <div class="brand footer-brand">
+              <img src="{{ url_for('static', filename='assets/logo.svg') }}" alt="TruthLens logo" class="brand-logo" />
+              <span>TruthLens</span>
+            </div>
+            <p>AI Image Authenticity Detection</p>
+          </div>
+
+          <div class="footer-links">
+            <a href="#top">GitHub</a>
+            <a href="#about">About</a>
+            <a href="#top">Home</a>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <div class="container">
+            <p>© 2026 TruthLens. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+  </body>
+</html>
